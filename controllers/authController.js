@@ -56,21 +56,39 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const { email, password } = req.body;
+  // let userlogin;
+  let useremail;
+  let username;
+  const { user, password } = req.body;
+  // if (req.body.username) {
+  //   userlogin = req.body.username;
+  // } else if (req.body.email) {
+  //   userlogin = req.body.email;
+  // }
 
-  if (!email || !password) {
+  if (!user || !password) {
     // console.log('hi');
-    return next(new AppError('Email or password is not entered', 400));
+    return next(new AppError('Account or password is not entered', 400));
   }
 
-  const user = await User.findOne({ email }).select('+password');
-
-  if (!user || !(await user.correctPassword(password, user.password))) {
-    // console.log('hi');
-    return next(new AppError('Email or password is not correct', 401));
+  if (user.includes('@')) {
+    useremail = req.body.user;
+  } else if (!user.includes('@')) {
+    username = req.body.user;
   }
 
-  signInUser(user._id, 201, res);
+  // const user = await User.findOne({ email }).select('+password');
+
+  const user1 = await User.findOne({
+    $or: [{ email: useremail }, { username: username }],
+  }).select('+password');
+
+  if (!user1 || !(await user1.correctPassword(password, user1.password))) {
+    // console.log('hi');
+    return next(new AppError('Account or password is not correct', 401));
+  }
+
+  signInUser(user1._id, 201, res);
 
   // const token = signInToken(user._id);
   // res.status(201).json({
