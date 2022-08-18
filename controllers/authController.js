@@ -37,6 +37,23 @@ const signInUser = (user, statuscode, res) => {
   });
 };
 
+const signInNewUser = (user, statuscode, res) => {
+  const token = signInToken(user._id);
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.EXPIRES_COOKIE_IN * 24 * 60 * 60 * 1000
+    ),
+
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  res.cookie('jwt', token, cookieOptions);
+
+  user.password = undefined;
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -48,7 +65,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     temprole: req.body.role,
   });
 
-  signInUser(newUser._id, 201, res);
+  signInNewUser(newUser._id, 201, res);
 
   req.user = newUser;
 
@@ -244,6 +261,10 @@ exports.sendEmailConfirm = catchAsync(async (req, res, next) => {
       email: user.email,
       subject: 'Email Confirmation',
       message,
+    });
+    res.status(200).json({
+      status: 'success',
+      message: 'Welcome! Account Confirmation link sent to your email',
     });
   } catch (err) {
     user.passwordResetToken = undefined;
