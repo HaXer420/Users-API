@@ -252,9 +252,9 @@ exports.sendEmailConfirm = catchAsync(async (req, res, next) => {
 
   const resetURL = `${req.protocol}://${req.get(
     'host'
-  )}/api1/users/emailconfrim/${EmailToken}`;
+  )}/api1/users/emailconfirm/${EmailToken}`;
 
-  const message = `Welcome to the Natours! Click on the given link to verify your Natours account:  ${resetURL} \n If you dont do this please ignore this email`;
+  const message = `Welcome to the Massab-Hammad User's Api! Click on the given link to verify your account:  ${resetURL} \n If you dont do this please ignore this email`;
 
   try {
     await sendEmail({
