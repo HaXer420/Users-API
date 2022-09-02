@@ -65,7 +65,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     temprole: req.body.role,
   });
 
-  signInNewUser(newUser._id, 201, res);
+  req.token = signInNewUser(newUser._id, 201, res);
 
   req.user = newUser;
 
@@ -263,6 +263,7 @@ exports.sendEmailConfirm = catchAsync(async (req, res, next) => {
     });
     res.status(200).json({
       status: 'success',
+      token: req.token,
       message: 'Welcome! Account Confirmation link sent to your email',
     });
   } catch (err) {
